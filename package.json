@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "keywords": ["game", "hundred-tiles"],
-  "author": "Yannis Rizos",
+  "author": "Yannis Rizos <yrizos@gmail.com> (https://yrizos.com",
   "license": "Unlicense",
   "description": "A grid-based CLI game where players aim to fill a 10x10 board of tiles in sequential order following specific movement rules.",
   "type": "module",
