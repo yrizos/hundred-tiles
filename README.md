@@ -72,7 +72,12 @@ The player chooses `(3, 2)` and marks it as `3`.
 
 Each new move follows the same rules, moving exactly 3 tiles horizontally or vertically or exactly 2 tiles diagonally, until the player fills all 100 tiles or runs out of valid moves.
 
-## Getting Started
+## Setup
+
+```sh
+git clone https://github.com/yourusername/hundred-tiles.git
+cd hundred-tiles
+```
 
 ### Running the Application Locally
 
