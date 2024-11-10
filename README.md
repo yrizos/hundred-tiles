@@ -75,7 +75,7 @@ Each new move follows the same rules, moving exactly 3 tiles horizontally or ver
 ## Setup
 
 ```sh
-git clone https://github.com/yourusername/hundred-tiles.git
+git clone https://github.com/yrizos/hundred-tiles.git
 cd hundred-tiles
 ```
 
