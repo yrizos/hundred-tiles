@@ -2,7 +2,7 @@
 
 ## Project
 
-This repository builds a small game. 
+This repository builds a small game.
 
 See [README.md](README.md) for the game rules, setup instructions, available scripts, and project structure.
 

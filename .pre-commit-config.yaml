@@ -4,11 +4,34 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [pre-commit]
+      - id: end-of-file-fixer
+        stages: [pre-commit]
+      - id: check-merge-conflict
+        stages: [pre-commit]
+      - id: check-yaml
+        stages: [pre-commit]
   - repo: local
     hooks:
       - id: vitest
         name: vitest
         entry: npx vitest run
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: tsc
+        name: tsc
+        entry: npx tsc -b
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: oxlint
+        name: oxlint
+        entry: npx oxlint
         language: system
         pass_filenames: false
         stages: [pre-commit]

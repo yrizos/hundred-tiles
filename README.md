@@ -44,6 +44,6 @@ npm run dev
 
 ## Development
 
-Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/). 
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/).
 
 A `commit-msg` pre-commit hook rejects non-conforming messages, and a `pre-commit` hook runs the Vitest suite before each commit.
