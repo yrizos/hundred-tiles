@@ -4,3 +4,11 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
+  - repo: local
+    hooks:
+      - id: vitest
+        name: vitest
+        entry: npx vitest run
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
