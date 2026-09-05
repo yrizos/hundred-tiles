@@ -1,5 +1,9 @@
 # Agent Guidance
 
+## Project
+
+This repository builds a small game. The game rules are documented in [docs/rules.md](docs/rules.md).
+
 ## Commit conventions
 
 Commit messages must follow Conventional Commits.
