@@ -17,12 +17,18 @@ repos:
         stages: [pre-commit]
   - repo: local
     hooks:
-      - id: vitest
-        name: vitest
-        entry: npx vitest run
+      - id: vitest-unit
+        name: vitest (unit)
+        entry: npx vitest run src/game
         language: system
         pass_filenames: false
         stages: [pre-commit]
+      - id: vitest-component
+        name: vitest (component)
+        entry: npx vitest run src/App.test.tsx src/components
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
       - id: tsc
         name: tsc
         entry: npx tsc -b

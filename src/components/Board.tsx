@@ -19,6 +19,7 @@ function Board({ state, onCellClick }: BoardProps) {
             <button
               key={`${rowIndex}-${colIndex}`}
               type="button"
+              aria-label={`Row ${rowIndex + 1}, column ${colIndex + 1}`}
               className={
                 'cell' +
                 (cell !== null ? ' cell--filled' : '') +

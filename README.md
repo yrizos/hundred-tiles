@@ -44,6 +44,12 @@ npm run dev
 
 ## Development
 
-Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/).
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/). A `commit-msg` hook rejects non-conforming messages.
 
-A `commit-msg` pre-commit hook rejects non-conforming messages, and a `pre-commit` hook runs the Vitest suite before each commit.
+A `pre-commit` hook runs type-checking, linting, and the unit tests (`src/game/`) before each commit. A `pre-push` hook runs the slower component tests (`src/App.test.tsx`, `src/components/`) before each push.
+
+The `pre-push` hook type isn't installed by `pre-commit install` alone, so after cloning, run:
+
+```bash
+pre-commit install --hook-type pre-push
+```

@@ -18,6 +18,6 @@ This is enforced by a `commit-msg` pre-commit hook (`.pre-commit-config.yaml`), 
 
 ## Testing
 
-Unit tests are written with Vitest. All generated code must be covered by unit tests.
+Unit tests are written with Vitest. All generated code must be covered by unit tests. When changing the UI, also add or update component tests using React Testing Library.
 
-Tests run on the `pre-commit` stage (`.pre-commit-config.yaml`), so uncommitted test failures will block a commit.
+Unit tests (`src/game/`) run on the `pre-commit` stage; component tests (`src/App.test.tsx`, `src/components/`) run on the `pre-push` stage (`.pre-commit-config.yaml`).
