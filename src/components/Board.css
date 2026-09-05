@@ -2,9 +2,15 @@
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
-  gap: 5px;
-  width: min(92vw, 520px);
+  gap: 3px;
+  width: 100%;
+  max-width: 420px;
   aspect-ratio: 1;
+
+  @media (min-width: 640px) {
+    gap: 5px;
+    max-width: 480px;
+  }
 }
 
 .cell {
@@ -12,11 +18,11 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--code-bg);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   padding: 0;
   cursor: default;
@@ -24,6 +30,11 @@
     background 0.12s ease,
     color 0.12s ease,
     transform 0.08s ease;
+
+  @media (min-width: 640px) {
+    border-radius: 6px;
+    font-size: 13px;
+  }
 }
 
 .cell--filled {
