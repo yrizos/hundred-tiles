@@ -1,0 +1,36 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  gap: 4px;
+  width: min(90vw, 500px);
+  aspect-ratio: 1;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  padding: 0;
+  cursor: default;
+}
+
+.cell--filled {
+  background: var(--code-bg);
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.cell--valid {
+  cursor: pointer;
+  border-color: var(--accent);
+}
+
+.cell--valid:hover {
+  background: var(--accent-bg);
+}
