@@ -2,7 +2,9 @@
 
 ## Project
 
-This repository builds a small game. The game rules are documented in [docs/rules.md](docs/rules.md).
+This repository builds a small game. 
+
+See [README.md](README.md) for the game rules, setup instructions, available scripts, and project structure.
 
 ## Commit conventions
 
