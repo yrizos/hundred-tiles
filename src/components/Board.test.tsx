@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { axe } from 'jest-axe'
 import { createGameState, placeNumber } from '../game/gameState'
 import Board from './Board'
 
@@ -10,20 +11,23 @@ describe('Board', () => {
     const onCellClick = vi.fn()
     render(<Board state={state} onCellClick={onCellClick} />)
 
-    const cell = screen.getByLabelText('Row 1, column 1')
+    const cell = screen.getByLabelText('Row 1, column 1, valid move')
     expect(cell).toBeEnabled()
 
     await userEvent.click(cell)
     expect(onCellClick).toHaveBeenCalledWith({ row: 0, col: 0 })
   })
 
-  it('shows the placed number and disables a filled tile', () => {
+  it('shows the placed number and disables a filled tile, and marks it as last placed', () => {
     const state = placeNumber(createGameState(), { row: 0, col: 0 })
     render(<Board state={state} onCellClick={vi.fn()} />)
 
-    const cell = screen.getByLabelText('Row 1, column 1')
+    const cell = screen.getByLabelText(
+      'Row 1, column 1, filled with 1, last placed',
+    )
     expect(cell).toHaveTextContent('1')
     expect(cell).toBeDisabled()
+    expect(cell).toHaveClass('cell--current')
   })
 
   it('disables a tile that is not a legal move', async () => {
@@ -36,5 +40,14 @@ describe('Board', () => {
 
     await userEvent.click(illegalCell)
     expect(onCellClick).not.toHaveBeenCalled()
+  })
+
+  it('has no automatically detectable accessibility violations', async () => {
+    const state = placeNumber(createGameState(), { row: 0, col: 0 })
+    const { container } = render(
+      <Board state={state} onCellClick={vi.fn()} />,
+    )
+
+    expect(await axe(container)).toHaveNoViolations()
   })
 })

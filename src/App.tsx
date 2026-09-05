@@ -19,22 +19,22 @@ function App() {
   }
 
   return (
-    <div id="game">
+    <main id="game">
       <h1>
         Hundred <span className="dim">Tiles</span>
       </h1>
-      <p className="status">
+      <output className="status" aria-live="polite">
         {won
           ? 'You reached 100!'
           : stuck
             ? `Stuck at ${state.nextNumber - 1}. No legal moves remain.`
             : `Place number ${state.nextNumber} of ${MAX_NUMBER}`}
-      </p>
+      </output>
       <Board state={state} onCellClick={handleCellClick} />
       <button type="button" className="reset" onClick={handleReset}>
         New game
       </button>
-    </div>
+    </main>
   )
 }
 

@@ -14,16 +14,28 @@ function Board({ state, onCellClick }: BoardProps) {
         row.map((cell, colIndex) => {
           const position: Position = { row: rowIndex, col: colIndex }
           const isValid = cell === null && isValidPlacement(state, position)
+          const isCurrent =
+            state.lastPosition?.row === rowIndex &&
+            state.lastPosition?.col === colIndex
+
+          const label = [
+            `Row ${rowIndex + 1}, column ${colIndex + 1}`,
+            cell !== null ? `filled with ${cell}` : isValid ? 'valid move' : '',
+            isCurrent ? 'last placed' : '',
+          ]
+            .filter(Boolean)
+            .join(', ')
 
           return (
             <button
               key={`${rowIndex}-${colIndex}`}
               type="button"
-              aria-label={`Row ${rowIndex + 1}, column ${colIndex + 1}`}
+              aria-label={label}
               className={
                 'cell' +
                 (cell !== null ? ' cell--filled' : '') +
-                (isValid ? ' cell--valid' : '')
+                (isValid ? ' cell--valid' : '') +
+                (isCurrent ? ' cell--current' : '')
               }
               disabled={!isValid}
               onClick={() => onCellClick(position)}

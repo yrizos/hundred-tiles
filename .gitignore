@@ -60,6 +60,9 @@ lib-cov
 coverage
 *.lcov
 
+# Vitest JSON reporter output
+.vitest/
+
 # nyc test coverage
 .nyc_output
 
