@@ -15,7 +15,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-h);
+  color: var(--text);
 
   @media (min-width: 640px) {
     font-size: 15px;
@@ -31,9 +31,9 @@
   padding: 12px 24px;
   min-height: 44px;
   border-radius: 999px;
-  border: 2px solid var(--text-h);
-  background: var(--text-h);
-  color: var(--bg);
+  border: 2px solid var(--text);
+  background: var(--code-bg);
+  color: var(--text-h);
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -46,6 +46,7 @@
 .reset:hover {
   background: var(--accent);
   border-color: var(--accent);
+  color: var(--on-accent);
 }
 
 .reset:active {

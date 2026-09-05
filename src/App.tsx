@@ -20,7 +20,9 @@ function App() {
 
   return (
     <div id="game">
-      <h1>Hundred Tiles</h1>
+      <h1>
+        Hundred <span className="dim">Tiles</span>
+      </h1>
       <p className="status">
         {won
           ? 'You reached 100!'

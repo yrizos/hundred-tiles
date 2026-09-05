@@ -45,13 +45,13 @@
 
 .cell--valid {
   cursor: pointer;
-  background: var(--accent-bg);
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 700;
 }
 
 .cell--valid:hover {
-  background: var(--accent);
+  background: var(--text-h);
   color: var(--bg);
   transform: scale(1.06);
 }
