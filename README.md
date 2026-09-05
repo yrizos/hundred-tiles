@@ -2,6 +2,8 @@
 
 A single-player number-placement puzzle played on a 10x10 board, built with React, TypeScript, and Vite.
 
+Play it live at [yrizos.github.io/hundred-tiles](https://yrizos.github.io/hundred-tiles/).
+
 ## Rules
 
 The game is played on a 10x10 board. Place the numbers 1 through 100 on the board, one at a time in sequence, until the board is full.
