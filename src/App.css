@@ -69,7 +69,7 @@
 @media (min-width: 640px) {
   #game {
     flex: initial;
-    max-width: 560px;
+    max-width: 800px;
     gap: 24px;
     padding: 40px 24px;
   }
