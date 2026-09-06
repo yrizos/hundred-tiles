@@ -17,8 +17,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid transparent;
-  border-radius: 4px;
+  border: none;
   background: var(--code-bg);
   color: var(--text);
   font-family: var(--mono);
@@ -32,7 +31,6 @@
     transform 0.08s ease;
 
   @media (min-width: 640px) {
-    border-radius: 6px;
     font-size: 16px;
   }
 }
@@ -45,14 +43,9 @@
 
 .cell--valid {
   cursor: pointer;
-  border-color: var(--on-accent);
   background: var(--accent);
   color: var(--on-accent);
   font-weight: 700;
-}
-
-.cell--valid:hover {
-  transform: scale(1.06);
 }
 
 .cell--current {
