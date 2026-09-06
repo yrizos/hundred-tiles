@@ -57,6 +57,46 @@ describe('getValidMoves', () => {
     expect(moves).toHaveLength(3)
   })
 
+  it('filters out destinations that fall off the board from the opposite corner', () => {
+    const state: GameState = {
+      board: createEmptyBoard(),
+      nextNumber: 2,
+      lastPosition: { row: 9, col: 9 },
+    }
+
+    const moves = getValidMoves(state)
+
+    expect(moves).toEqual(
+      expect.arrayContaining([
+        { row: 9, col: 6 },
+        { row: 6, col: 9 },
+        { row: 7, col: 7 },
+      ]),
+    )
+    expect(moves).toHaveLength(3)
+  })
+
+  it('filters out destinations that fall off the board from a straight edge tile', () => {
+    const state: GameState = {
+      board: createEmptyBoard(),
+      nextNumber: 2,
+      lastPosition: { row: 0, col: 5 },
+    }
+
+    const moves = getValidMoves(state)
+
+    expect(moves).toEqual(
+      expect.arrayContaining([
+        { row: 0, col: 8 },
+        { row: 0, col: 2 },
+        { row: 3, col: 5 },
+        { row: 2, col: 7 },
+        { row: 2, col: 3 },
+      ]),
+    )
+    expect(moves).toHaveLength(5)
+  })
+
   it('filters out destinations that are already occupied', () => {
     const board = createEmptyBoard()
     board[5][8] = 1
@@ -104,5 +144,25 @@ describe('isValidPlacement', () => {
     }
 
     expect(isValidPlacement(state, { row: 5, col: 6 })).toBe(false)
+  })
+
+  it('accepts any empty tile for the first placement', () => {
+    const state: GameState = {
+      board: createEmptyBoard(),
+      nextNumber: 1,
+      lastPosition: null,
+    }
+
+    expect(isValidPlacement(state, { row: 7, col: 2 })).toBe(true)
+  })
+
+  it('rejects a position that is off the board', () => {
+    const state: GameState = {
+      board: createEmptyBoard(),
+      nextNumber: 2,
+      lastPosition: { row: 5, col: 5 },
+    }
+
+    expect(isValidPlacement(state, { row: -1, col: 5 })).toBe(false)
   })
 })

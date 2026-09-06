@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createGameState, isStuck, isWon, placeNumber } from './gameState'
 import { createEmptyBoard } from './board'
 import { MAX_NUMBER, type GameState } from './types'
+import { WINNING_SEQUENCE } from './winningSequence'
 
 describe('createGameState', () => {
   it('starts with an empty board and number 1 to place', () => {
@@ -24,6 +25,29 @@ describe('placeNumber', () => {
 
     expect(state.board[4][4]).toBeNull()
     expect(state.nextNumber).toBe(1)
+  })
+
+  it('returns board rows that are new array instances, not shared with the original', () => {
+    const state = createGameState()
+    const next = placeNumber(state, { row: 4, col: 4 })
+
+    expect(next.board).not.toBe(state.board)
+    next.board.forEach((row, index) => {
+      expect(row).not.toBe(state.board[index])
+    })
+  })
+
+  it('wins only after the 100th placement of a full game', () => {
+    let state = createGameState()
+
+    WINNING_SEQUENCE.forEach((position, index) => {
+      state = placeNumber(state, position)
+      if (index < WINNING_SEQUENCE.length - 1) {
+        expect(isWon(state)).toBe(false)
+      }
+    })
+
+    expect(isWon(state)).toBe(true)
   })
 })
 

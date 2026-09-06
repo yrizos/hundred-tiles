@@ -29,6 +29,10 @@ describe('isOnBoard', () => {
     expect(isOnBoard({ row: 10, col: 0 })).toBe(false)
     expect(isOnBoard({ row: 0, col: 10 })).toBe(false)
   })
+
+  it('returns false for a position out of bounds on both axes at once', () => {
+    expect(isOnBoard({ row: -1, col: 10 })).toBe(false)
+  })
 })
 
 describe('isEmpty', () => {

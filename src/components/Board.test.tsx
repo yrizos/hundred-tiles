@@ -42,6 +42,25 @@ describe('Board', () => {
     expect(onCellClick).not.toHaveBeenCalled()
   })
 
+  it('gives a valid move the valid class without the filled or current classes', () => {
+    const state = placeNumber(createGameState(), { row: 0, col: 0 })
+    render(<Board state={state} onCellClick={vi.fn()} />)
+
+    const validCell = screen.getByLabelText('Row 1, column 4, valid move')
+    expect(validCell.className).toContain('cell--valid')
+    expect(validCell.className).not.toContain('cell--filled')
+    expect(validCell.className).not.toContain('cell--current')
+  })
+
+  it('gives an illegal, unfilled tile neither the valid nor the filled class', () => {
+    const state = placeNumber(createGameState(), { row: 0, col: 0 })
+    render(<Board state={state} onCellClick={vi.fn()} />)
+
+    const illegalCell = screen.getByLabelText('Row 1, column 2')
+    expect(illegalCell.className).not.toContain('cell--valid')
+    expect(illegalCell.className).not.toContain('cell--filled')
+  })
+
   it('has no automatically detectable accessibility violations', async () => {
     const state = placeNumber(createGameState(), { row: 0, col: 0 })
     const { container } = render(
