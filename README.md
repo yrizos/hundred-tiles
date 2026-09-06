@@ -6,14 +6,19 @@ Play it live at [yrizos.github.io/hundred-tiles](https://yrizos.github.io/hundre
 
 ## Rules
 
-The game is played on a 10x10 board. Place the numbers 1 through 100 on the board, one at a time in sequence, until the board is full.
+Place the numbers 1 through 100 on a 10x10 board, one at a time in sequence, until the board is full.
 
-The number 1 can be placed on any tile. Each subsequent number must be placed using one of the following moves from the tile holding the previous number:
+The number 1 can go anywhere. After that, each number must land a fixed distance from the one before it:
 
-- **Horizontal or vertical move**: skip over 2 tiles, landing 3 tiles away in that direction. For example, if 1 is placed at (1,1), 2 can be placed at (1,4).
-- **Diagonal move**: skip over 1 tile, landing 2 tiles away diagonally. For example, if 1 is placed at (1,1), 2 can be placed at (3,3).
+- **Horizontal or vertical**: 3 squares away in a straight line. For example, if 1 is at (1,1), 2 can go at (1,4).
+- **Diagonal**: 2 squares away. For example, if 1 is at (1,1), 2 can go at (3,3).
 
-A tile can only hold one number, so a move cannot land on a tile that is already filled. The game ends when the board is full or no legal move remains.
+A square that's already filled can't be used again. The game ends when the board is full or no legal move remains.
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) 24 or later, and npm (this project uses `package-lock.json`).
+- [pre-commit](https://pre-commit.com/), if you want the commit and push hooks described below to run. It's not required just to run or build the game.
 
 ## Getting started
 
@@ -41,6 +46,9 @@ npm run dev
 
 - `src/game/` — game logic (board, moves, game state)
 - `src/components/` — React components
+- `src/App.tsx` — top-level app state and layout
+- `src/main.tsx` — entry point
+- `src/test/` — shared test setup (jest-dom and jest-axe wiring)
 
 ## Development
 
@@ -48,8 +56,22 @@ Commit messages must follow [Conventional Commits](https://www.conventionalcommi
 
 A `pre-commit` hook runs type-checking, linting, and the unit tests (`src/game/`) before each commit. A `pre-push` hook runs the slower component tests (`src/App.test.tsx`, `src/components/`) before each push.
 
-The `pre-push` hook type isn't installed by `pre-commit install` alone, so after cloning, run:
+After cloning, install the hooks:
+
+```bash
+pre-commit install
+```
+
+This covers the commit-msg and pre-commit stages. The pre-push stage needs a separate install, since `pre-commit install` doesn't set it up on its own:
 
 ```bash
 pre-commit install --hook-type pre-push
 ```
+
+## Deployment
+
+Pushes to `main` that touch source or config files trigger a GitHub Actions workflow (`.github/workflows/deploy.yml`) that runs the test suite, builds the app, and deploys it to GitHub Pages. `vite.config.ts` sets `base: './'` so the build works correctly under the GitHub Pages subpath.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
