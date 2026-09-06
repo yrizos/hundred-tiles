@@ -39,15 +39,57 @@ describe('App', () => {
     expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
   })
 
-  it('resets the game when "New game" is clicked', async () => {
+  it('disables "New game" until a number has been placed', async () => {
+    render(<App />)
+
+    const resetButton = screen.getByRole('button', { name: 'New game' })
+    expect(resetButton).toBeDisabled()
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+
+    expect(resetButton).toBeEnabled()
+  })
+
+  it('asks for confirmation and resets the game once confirmed', async () => {
     render(<App />)
 
     await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
     expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    expect(
+      screen.getByRole('alertdialog', { name: 'Start a new game?' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
 
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Confirm' }),
+    )
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+  })
+
+  it('keeps the game unchanged when the reset confirmation is cancelled', async () => {
+    render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+  })
+
+  it('keeps the game unchanged when the reset confirmation is dismissed with Escape', async () => {
+    render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.keyboard('{Escape}')
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
   })
 
   it('has no automatically detectable accessibility violations', async () => {
@@ -75,7 +117,15 @@ describe('App', () => {
 
     expect(
       screen.getByText('Stuck at 6. No legal moves remain.'),
-    ).toBeInTheDocument()
+    ).toHaveClass('status--stuck')
+  })
+
+  it('does not apply the stuck or won style while moves remain', () => {
+    render(<App />)
+
+    const status = screen.getByText('Place number 1 of 100')
+    expect(status).not.toHaveClass('status--stuck')
+    expect(status).not.toHaveClass('status--won')
   })
 
   it('shows the win message after a full game and resets from it', async () => {
@@ -85,9 +135,12 @@ describe('App', () => {
       await userEvent.click(screen.getByLabelText(cellLabel(row, col)))
     }
 
-    expect(screen.getByText('You reached 100!')).toBeInTheDocument()
+    expect(screen.getByText('You reached 100!')).toHaveClass('status--won')
 
     await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Confirm' }),
+    )
     expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
   }, 20000)
 })

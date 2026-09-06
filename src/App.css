@@ -23,6 +23,11 @@
   }
 }
 
+.status--stuck,
+.status--won {
+  color: var(--accent-text);
+}
+
 .reset {
   font-size: 14px;
   font-weight: 700;
@@ -49,8 +54,16 @@
   color: var(--on-accent);
 }
 
-.reset:active {
+.reset:active:not(:disabled) {
   transform: scale(0.97);
+}
+
+.reset:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  border-color: var(--border);
+  background: var(--code-bg);
+  color: var(--text);
 }
 
 @media (min-width: 640px) {
