@@ -123,6 +123,21 @@ describe('getValidMoves', () => {
 
     expect(getValidMoves(state)).toEqual([])
   })
+
+  it('returns no moves when every legal destination is already occupied', () => {
+    const board = createEmptyBoard()
+    board[0][0] = 1
+    board[0][3] = 2
+    board[3][0] = 3
+    board[2][2] = 4
+    const state: GameState = {
+      board,
+      nextNumber: 5,
+      lastPosition: { row: 0, col: 0 },
+    }
+
+    expect(getValidMoves(state)).toEqual([])
+  })
 })
 
 describe('isValidPlacement', () => {
@@ -164,5 +179,17 @@ describe('isValidPlacement', () => {
     }
 
     expect(isValidPlacement(state, { row: -1, col: 5 })).toBe(false)
+  })
+
+  it('rejects a legal-looking coordinate when it is already occupied', () => {
+    const board = createEmptyBoard()
+    board[5][8] = 1
+    const state: GameState = {
+      board,
+      nextNumber: 2,
+      lastPosition: { row: 5, col: 5 },
+    }
+
+    expect(isValidPlacement(state, { row: 5, col: 8 })).toBe(false)
   })
 })

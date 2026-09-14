@@ -11,7 +11,7 @@ import { MAX_NUMBER, type GameState } from './types'
 import { WINNING_SEQUENCE } from './winningSequence'
 
 describe('createGameState', () => {
-  it('starts with an empty board and number 1 to place', () => {
+  it('starts with an empty board and the first number to place', () => {
     const state = createGameState()
 
     expect(state.nextNumber).toBe(1)
@@ -21,7 +21,7 @@ describe('createGameState', () => {
 })
 
 describe('placeNumber', () => {
-  it('places the next number and advances state without mutating the original', () => {
+  it('places the next number and advances the state without mutating the original', () => {
     const state = createGameState()
     const next = placeNumber(state, { row: 4, col: 4 })
 
@@ -33,7 +33,7 @@ describe('placeNumber', () => {
     expect(state.nextNumber).toBe(1)
   })
 
-  it('returns board rows that are new array instances, not shared with the original', () => {
+  it('creates new row arrays instead of reusing the original board rows', () => {
     const state = createGameState()
     const next = placeNumber(state, { row: 4, col: 4 })
 
@@ -72,7 +72,7 @@ describe('undoLastMove', () => {
     expect(state.board[0][3]).toBe(2)
   })
 
-  it('returns the initial state when there is no move to undo', () => {
+  it('returns the current state when there is no move to undo', () => {
     const state = createGameState()
 
     expect(undoLastMove(state)).toBe(state)

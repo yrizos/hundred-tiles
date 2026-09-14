@@ -38,6 +38,19 @@ Unit tests are written with Vitest. New code needs unit test coverage. When chan
 
 Unit tests (`src/game/`) run on the `pre-commit` stage. Component tests (`src/App.test.tsx`, `src/components/`) run on the `pre-push` stage (`.pre-commit-config.yaml`).
 
+### Test-writing rules
+
+- Test observable behavior and public contracts, not implementation details, private helpers, React state, or CSS structure.
+- For game logic, cover the happy path, empty and boundary states, invalid moves, terminal states, and immutability. Assert the complete returned state when a transition changes multiple fields.
+- For components, query through accessible roles, names, and labels (`getByRole`, `getByLabelText`, and similar). Do not use CSS selectors, element order, or text that is only an implementation detail when an accessible query exists.
+- Create a fresh game state and mock callback for each test. Do not share mutable fixtures between tests. Clear localStorage in cleanup whenever a test writes persistence state.
+- Use `userEvent` for interactions and await every interaction that returns a promise. Prefer user-visible outcomes over callback-call assertions; use callback assertions only when the component contract is the callback itself.
+- Test important state transitions as a sequence of user actions, including undo/redo, reset confirmation and cancellation, reload or remount persistence, and the full winning sequence when relevant.
+- Every changed rendered component needs a `jest-axe` check with `expect(await axe(container)).toHaveNoViolations()` plus behavioral assertions. Keep accessibility assertions in the component test for the affected UI.
+- Make tests deterministic: avoid timers, random values, network calls, and reliance on test execution order. Mock only external boundaries and restore mocks after each test.
+- Name tests after the behavior and its outcome. Keep each test focused on one contract; use small local helpers only for repeated domain actions such as placing a move.
+- Run the narrowest relevant Vitest test file first, then run `npm test -- --run` and `npm run lint` before considering the change complete.
+
 ## Accessibility
 
 All UI must meet WCAG 2.2 AA. In particular:
