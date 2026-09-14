@@ -54,6 +54,60 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeDisabled()
   })
 
+  it('redoes the latest undone move and restores its undo allowance', async () => {
+    render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Redo (1 available)' }),
+    )
+
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+    expect(
+      screen.getByLabelText('Row 1, column 1, filled with 1, last placed'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Undo (3 left)' })).toBeEnabled()
+    expect(
+      screen.getByRole('button', { name: 'Redo (0 available)' }),
+    ).toBeDisabled()
+  })
+
+  it('redoes multiple undone moves in order', async () => {
+    render(<App />)
+
+    for (const position of [
+      [0, 0],
+      [0, 3],
+      [0, 6],
+    ]) {
+      await userEvent.click(
+        screen.getByLabelText(cellLabel(position[0], position[1])),
+      )
+    }
+
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (2 left)' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (1 left)' }))
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Redo (3 available)' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Redo (2 available)' }),
+    )
+
+    expect(screen.getByText('Place number 3 of 100')).toBeInTheDocument()
+    expect(screen.getByLabelText(cellLabel(0, 0))).toHaveTextContent('1')
+    expect(screen.getByLabelText(cellLabel(0, 3))).toHaveTextContent('2')
+    expect(
+      screen.getByLabelText('Row 1, column 7, valid move'),
+    ).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeEnabled()
+    expect(
+      screen.getByRole('button', { name: 'Redo (1 available)' }),
+    ).toBeEnabled()
+  })
+
   it('allows only three undos and restores the allowance after a reset', async () => {
     render(<App />)
 
@@ -92,6 +146,23 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeDisabled()
   })
 
+  it('persists redo history after a reload', async () => {
+    const firstRender = render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    firstRender.unmount()
+    render(<App />)
+
+    expect(
+      screen.getByRole('button', { name: 'Redo (1 available)' }),
+    ).toBeEnabled()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Redo (1 available)' }),
+    )
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+  })
+
   it('does not create a redo after placing a new move following an undo', async () => {
     render(<App />)
 
@@ -99,7 +170,9 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
     await userEvent.click(screen.getByLabelText('Row 1, column 2, valid move'))
 
-    expect(screen.queryByRole('button', { name: /Redo/ })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Redo (0 available)' }),
+    ).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeEnabled()
     expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
   })

@@ -37,6 +37,7 @@
 }
 
 .undo,
+.redo,
 .reset {
   font-size: 14px;
   font-weight: 700;
@@ -57,6 +58,7 @@
 }
 
 .undo:hover:not(:disabled),
+.redo:hover:not(:disabled),
 .reset:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
@@ -64,11 +66,13 @@
 }
 
 .undo:active:not(:disabled),
+.redo:active:not(:disabled),
 .reset:active:not(:disabled) {
   transform: scale(0.97);
 }
 
 .undo:disabled,
+.redo:disabled,
 .reset:disabled {
   cursor: not-allowed;
   opacity: 0.5;

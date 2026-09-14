@@ -17,6 +17,7 @@ const MAX_UNDO_STEPS = 3
 interface SavedGame {
   state: GameState
   undosRemaining: number
+  redoStates: GameState[]
 }
 
 function isValidGameState(value: unknown): value is GameState {
@@ -49,56 +50,76 @@ function isValidGameState(value: unknown): value is GameState {
   )
 }
 
+function isValidRedoStates(value: unknown): value is GameState[] {
+  return Array.isArray(value) && value.every(isValidGameState)
+}
+
 function loadGame(): SavedGame {
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY)
     if (!saved) {
-      return { state: createGameState(), undosRemaining: MAX_UNDO_STEPS }
+      return {
+        state: createGameState(),
+        undosRemaining: MAX_UNDO_STEPS,
+        redoStates: [],
+      }
     }
 
     const parsed: unknown = JSON.parse(saved)
     if (isValidGameState(parsed)) {
-      return { state: parsed, undosRemaining: MAX_UNDO_STEPS }
+      return {
+        state: parsed,
+        undosRemaining: MAX_UNDO_STEPS,
+        redoStates: [],
+      }
     }
 
     if (!parsed || typeof parsed !== 'object') return {
       state: createGameState(),
       undosRemaining: MAX_UNDO_STEPS,
+      redoStates: [],
     }
 
     const savedGame = parsed as Partial<SavedGame>
     const undosRemaining = savedGame.undosRemaining
+    const redoStates = savedGame.redoStates ?? []
     if (
       isValidGameState(savedGame.state) &&
       typeof undosRemaining === 'number' &&
       Number.isInteger(undosRemaining) &&
       undosRemaining >= 0 &&
-      undosRemaining <= MAX_UNDO_STEPS
+      undosRemaining <= MAX_UNDO_STEPS &&
+      isValidRedoStates(redoStates)
     ) {
       return {
         state: savedGame.state,
         undosRemaining,
+        redoStates,
       }
     }
   } catch {
   }
 
-  return { state: createGameState(), undosRemaining: MAX_UNDO_STEPS }
+  return {
+    state: createGameState(),
+    undosRemaining: MAX_UNDO_STEPS,
+    redoStates: [],
+  }
 }
 
 function App() {
-  const [{ state, undosRemaining }, setGame] = useState(loadGame)
+  const [{ state, undosRemaining, redoStates }, setGame] = useState(loadGame)
   const [confirmingReset, setConfirmingReset] = useState(false)
 
   useEffect(() => {
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ state, undosRemaining } satisfies SavedGame),
+        JSON.stringify({ state, undosRemaining, redoStates } satisfies SavedGame),
       )
     } catch {
     }
-  }, [state, undosRemaining])
+  }, [state, undosRemaining, redoStates])
 
   const won = isWon(state)
   const stuck = isStuck(state)
@@ -107,6 +128,7 @@ function App() {
     setGame((current) => ({
       state: placeNumber(current.state, position),
       undosRemaining: current.undosRemaining,
+      redoStates: [],
     }))
   }
 
@@ -116,6 +138,20 @@ function App() {
     setGame((current) => ({
       state: undoLastMove(current.state),
       undosRemaining: current.undosRemaining - 1,
+      redoStates: [...current.redoStates, current.state],
+    }))
+  }
+
+  const handleRedo = () => {
+    if (redoStates.length === 0) return
+
+    setGame((current) => ({
+      state: current.redoStates[current.redoStates.length - 1],
+      undosRemaining: Math.min(
+        MAX_UNDO_STEPS,
+        current.undosRemaining + 1,
+      ),
+      redoStates: current.redoStates.slice(0, -1),
     }))
   }
 
@@ -124,7 +160,11 @@ function App() {
   }
 
   const handleConfirmReset = () => {
-    setGame({ state: createGameState(), undosRemaining: MAX_UNDO_STEPS })
+    setGame({
+      state: createGameState(),
+      undosRemaining: MAX_UNDO_STEPS,
+      redoStates: [],
+    })
     setConfirmingReset(false)
   }
 
@@ -158,6 +198,14 @@ function App() {
           onClick={handleUndo}
         >
           Undo ({undosRemaining} left)
+        </button>
+        <button
+          type="button"
+          className="redo"
+          disabled={redoStates.length === 0}
+          onClick={handleRedo}
+        >
+          Redo ({redoStates.length} available)
         </button>
         <button
           type="button"
