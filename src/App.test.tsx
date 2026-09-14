@@ -54,6 +54,22 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeDisabled()
   })
 
+  it('shows undo and redo icons with counters around the new game button', () => {
+    render(<App />)
+
+    const actions = screen.getByRole('button', { name: 'New game' }).parentElement
+    const buttons = actions?.querySelectorAll('button')
+
+    expect(buttons).toHaveLength(3)
+    expect(buttons?.[0]).toHaveAttribute('title', 'undo (3 left)')
+    expect(buttons?.[0]?.querySelector('svg')).toBeInTheDocument()
+    expect(buttons?.[0]).toHaveTextContent('3')
+    expect(buttons?.[1]).toHaveTextContent('New game')
+    expect(buttons?.[2]).toHaveAttribute('title', 'redo (0 available)')
+    expect(buttons?.[2]?.querySelector('svg')).toBeInTheDocument()
+    expect(buttons?.[2]).toHaveTextContent('0')
+  })
+
   it('redoes the latest undone move and restores its undo allowance', async () => {
     render(<App />)
 

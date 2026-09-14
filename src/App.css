@@ -37,7 +37,88 @@
 }
 
 .undo,
-.redo,
+.redo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 58px;
+  min-height: 52px;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.action-icon {
+  flex: 0 0 auto;
+}
+
+.action-count {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.undo::after,
+.redo::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 2;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: var(--text-h);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.undo:hover::after,
+.redo:hover::after,
+.undo:focus-visible::after,
+.redo:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.undo:hover:not(:disabled),
+.redo:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.reset:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.undo:active:not(:disabled),
+.redo:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.undo:disabled,
+.redo:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  color: var(--text);
+}
+
 .reset {
   font-size: 14px;
   font-weight: 700;
@@ -54,25 +135,12 @@
     background 0.15s ease,
     border-color 0.15s ease,
     transform 0.1s ease;
-
 }
 
-.undo:hover:not(:disabled),
-.redo:hover:not(:disabled),
-.reset:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-
-.undo:active:not(:disabled),
-.redo:active:not(:disabled),
 .reset:active:not(:disabled) {
   transform: scale(0.97);
 }
 
-.undo:disabled,
-.redo:disabled,
 .reset:disabled {
   cursor: not-allowed;
   opacity: 0.5;

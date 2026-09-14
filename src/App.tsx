@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Redo2, Undo2 } from 'lucide-react'
 import Board from './components/Board'
 import ConfirmDialog from './components/ConfirmDialog'
 import {
@@ -194,18 +195,19 @@ function App() {
         <button
           type="button"
           className="undo"
+          aria-label={`Undo (${undosRemaining} left)`}
+          title={`undo (${undosRemaining} left)`}
+          data-tooltip="undo"
           disabled={undosRemaining === 0 || state.nextNumber === 1}
           onClick={handleUndo}
         >
-          Undo ({undosRemaining} left)
-        </button>
-        <button
-          type="button"
-          className="redo"
-          disabled={redoStates.length === 0}
-          onClick={handleRedo}
-        >
-          Redo ({redoStates.length} available)
+          <Undo2
+            className="action-icon"
+            size={34}
+            strokeWidth={3}
+            aria-hidden="true"
+          />
+          <span className="action-count">{undosRemaining}</span>
         </button>
         <button
           type="button"
@@ -214,6 +216,23 @@ function App() {
           onClick={handleReset}
         >
           New game
+        </button>
+        <button
+          type="button"
+          className="redo"
+          aria-label={`Redo (${redoStates.length} available)`}
+          title={`redo (${redoStates.length} available)`}
+          data-tooltip="redo"
+          disabled={redoStates.length === 0}
+          onClick={handleRedo}
+        >
+          <Redo2
+            className="action-icon"
+            size={34}
+            strokeWidth={3}
+            aria-hidden="true"
+          />
+          <span className="action-count">{redoStates.length}</span>
         </button>
       </div>
       {confirmingReset && (
