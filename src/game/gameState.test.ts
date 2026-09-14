@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { createGameState, isStuck, isWon, placeNumber } from './gameState'
+import {
+  createGameState,
+  isStuck,
+  isWon,
+  placeNumber,
+  undoLastMove,
+} from './gameState'
 import { createEmptyBoard } from './board'
 import { MAX_NUMBER, type GameState } from './types'
 import { WINNING_SEQUENCE } from './winningSequence'
@@ -48,6 +54,28 @@ describe('placeNumber', () => {
     })
 
     expect(isWon(state)).toBe(true)
+  })
+})
+
+describe('undoLastMove', () => {
+  it('removes the latest number and restores the previous last position', () => {
+    let state = createGameState()
+    state = placeNumber(state, { row: 0, col: 0 })
+    state = placeNumber(state, { row: 0, col: 3 })
+
+    const previous = undoLastMove(state)
+
+    expect(previous.board[0][3]).toBeNull()
+    expect(previous.board[0][0]).toBe(1)
+    expect(previous.nextNumber).toBe(2)
+    expect(previous.lastPosition).toEqual({ row: 0, col: 0 })
+    expect(state.board[0][3]).toBe(2)
+  })
+
+  it('returns the initial state when there is no move to undo', () => {
+    const state = createGameState()
+
+    expect(undoLastMove(state)).toBe(state)
   })
 })
 

@@ -43,6 +43,67 @@ describe('App', () => {
     expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
   })
 
+  it('undoes the latest move', async () => {
+    render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+
+    expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+    expect(screen.getByLabelText('Row 1, column 1, valid move')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeDisabled()
+  })
+
+  it('allows only three undos and restores the allowance after a reset', async () => {
+    render(<App />)
+
+    for (const position of [
+      [0, 0],
+      [0, 3],
+      [0, 6],
+    ]) {
+      await userEvent.click(
+        screen.getByLabelText(cellLabel(position[0], position[1])),
+      )
+    }
+
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (2 left)' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (1 left)' }))
+
+    expect(screen.getByRole('button', { name: 'Undo (0 left)' })).toBeDisabled()
+    expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    expect(screen.getByRole('button', { name: 'Undo (3 left)' })).toBeDisabled()
+  })
+
+  it('persists the remaining undo allowance after a reload', async () => {
+    const firstRender = render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    firstRender.unmount()
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeDisabled()
+  })
+
+  it('does not create a redo after placing a new move following an undo', async () => {
+    render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo (3 left)' }))
+    await userEvent.click(screen.getByLabelText('Row 1, column 2, valid move'))
+
+    expect(screen.queryByRole('button', { name: /Redo/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Undo (2 left)' })).toBeEnabled()
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+  })
+
   it('restores the game after the app is remounted', async () => {
     const firstRender = render(<App />)
 
