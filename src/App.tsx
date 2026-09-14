@@ -1,13 +1,66 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Board from './components/Board'
 import ConfirmDialog from './components/ConfirmDialog'
-import { createGameState, isStuck, isWon, placeNumber } from './game/gameState'
-import { MAX_NUMBER, type Position } from './game/types'
+import {
+  createGameState,
+  isStuck,
+  isWon,
+  placeNumber,
+} from './game/gameState'
+import { BOARD_SIZE, MAX_NUMBER, type GameState, type Position } from './game/types'
 import './App.css'
 
+const STORAGE_KEY = 'hundred-tiles-game-state'
+
+function loadGameState(): GameState {
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY)
+    if (!saved) return createGameState()
+
+    const parsed = JSON.parse(saved) as GameState
+    const hasValidBoard =
+      Array.isArray(parsed.board) &&
+      parsed.board.length === BOARD_SIZE &&
+      parsed.board.every(
+        (row) =>
+          Array.isArray(row) &&
+          row.length === BOARD_SIZE &&
+          row.every((cell) => cell === null || Number.isInteger(cell)),
+      )
+    const hasValidLastPosition =
+      parsed.lastPosition === null ||
+      (parsed.lastPosition !== undefined &&
+        Number.isInteger(parsed.lastPosition.row) &&
+        Number.isInteger(parsed.lastPosition.col) &&
+        parsed.lastPosition.row >= 0 &&
+        parsed.lastPosition.row < BOARD_SIZE &&
+        parsed.lastPosition.col >= 0 &&
+        parsed.lastPosition.col < BOARD_SIZE)
+
+    if (
+      !hasValidBoard ||
+      !Number.isInteger(parsed.nextNumber) ||
+      !hasValidLastPosition
+    ) {
+      return createGameState()
+    }
+
+    return parsed
+  } catch {
+    return createGameState()
+  }
+}
+
 function App() {
-  const [state, setState] = useState(createGameState())
+  const [state, setState] = useState(loadGameState)
   const [confirmingReset, setConfirmingReset] = useState(false)
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    } catch {
+    }
+  }, [state])
 
   const won = isWon(state)
   const stuck = isStuck(state)

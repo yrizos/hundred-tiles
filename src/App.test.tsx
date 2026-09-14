@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { axe } from 'jest-axe'
 import App from './App'
 import { WINNING_SEQUENCE } from './game/winningSequence'
@@ -19,6 +19,10 @@ function cellLabel(row: number, col: number) {
 }
 
 describe('App', () => {
+  afterEach(() => {
+    window.localStorage.clear()
+  })
+
   it('starts with a message to place number 1', () => {
     render(<App />)
     expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
@@ -37,6 +41,19 @@ describe('App', () => {
     await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
 
     expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+  })
+
+  it('restores the game after the app is remounted', async () => {
+    const firstRender = render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    firstRender.unmount()
+    render(<App />)
+
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+    expect(
+      screen.getByLabelText('Row 1, column 1, filled with 1, last placed'),
+    ).toBeInTheDocument()
   })
 
   it('disables "New game" until a number has been placed', async () => {
@@ -67,6 +84,26 @@ describe('App', () => {
     )
 
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+  })
+
+  it('does not restore progress after a confirmed reset', async () => {
+    const firstRender = render(<App />)
+
+    await userEvent.click(screen.getByLabelText('Row 1, column 1, valid move'))
+    await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    firstRender.unmount()
+    render(<App />)
+
+    expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+  })
+
+  it('starts a new game when saved state is invalid', () => {
+    window.localStorage.setItem('hundred-tiles-game-state', '{invalid')
+
+    render(<App />)
+
     expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
   })
 
