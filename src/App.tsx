@@ -177,6 +177,20 @@ function App() {
     }
   }, [state, undosRemaining, redoStates])
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (confirmingReset || (!event.ctrlKey && !event.metaKey)) return
+
+      if (event.key.toLowerCase() !== 'z') return
+
+      event.preventDefault()
+      dispatch({ type: event.shiftKey ? 'redo' : 'undo' })
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [confirmingReset])
+
   const won = isWon(state)
   const stuck = isStuck(state)
 

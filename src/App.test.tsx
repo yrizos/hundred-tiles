@@ -120,6 +120,54 @@ describe('App', () => {
     ).toBeEnabled()
   })
 
+  it.each([
+    ['Control', 'Ctrl+Z'],
+    ['Meta', 'Cmd+Z'],
+  ])('undoes a move with %s+Z (%s)', async (modifier) => {
+    render(<App />)
+
+    await placeMove(0, 0)
+    await userEvent.keyboard(`{${modifier}>}z{/${modifier}}`)
+
+    expect(screen.getByText('Place number 1 of 100')).toBeInTheDocument()
+  })
+
+  it.each([
+    ['Control', 'Ctrl+Shift+Z'],
+    ['Meta', 'Cmd+Shift+Z'],
+  ])('redoes a move with %s+Shift+Z (%s)', async (modifier) => {
+    render(<App />)
+
+    await placeMove(0, 0)
+    await userEvent.keyboard(`{${modifier}>}z{/${modifier}}`)
+    await userEvent.keyboard(`{${modifier}>}{Shift>}z{/Shift}{/${modifier}}`)
+
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+    expect(
+      screen.getByLabelText('Row 1, column 1, filled with 1, last placed'),
+    ).toBeInTheDocument()
+  })
+
+  it('does not handle a plain Z key as undo or redo', async () => {
+    render(<App />)
+
+    await placeMove(0, 0)
+    await userEvent.keyboard('z')
+
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+  })
+
+  it('does not handle undo and redo shortcuts while reset confirmation is open', async () => {
+    render(<App />)
+
+    await placeMove(0, 0)
+    await userEvent.click(screen.getByRole('button', { name: 'New game' }))
+    await userEvent.keyboard('{Control>}z{/Control}')
+
+    expect(screen.getByText('Place number 2 of 100')).toBeInTheDocument()
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+  })
+
   it('allows only three undos and restores the allowance after a reset', async () => {
     render(<App />)
 
