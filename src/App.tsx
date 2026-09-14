@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { Redo2, Undo2 } from 'lucide-react'
 import Board from './components/Board'
 import ConfirmDialog from './components/ConfirmDialog'
@@ -108,8 +108,63 @@ function loadGame(): SavedGame {
   }
 }
 
+type GameAction =
+  | { type: 'place'; position: Position }
+  | { type: 'undo' }
+  | { type: 'redo' }
+  | { type: 'reset' }
+
+function gameReducer(current: SavedGame, action: GameAction): SavedGame {
+  switch (action.type) {
+    case 'place':
+      return {
+        state: placeNumber(current.state, action.position),
+        undosRemaining: current.undosRemaining,
+        redoStates: [],
+      }
+
+    case 'undo': {
+      if (current.undosRemaining === 0 || current.state.nextNumber === 1) {
+        return current
+      }
+
+      return {
+        state: undoLastMove(current.state),
+        undosRemaining: current.undosRemaining - 1,
+        redoStates: [...current.redoStates, current.state],
+      }
+    }
+
+    case 'redo': {
+      if (current.redoStates.length === 0) {
+        return current
+      }
+
+      return {
+        state: current.redoStates[current.redoStates.length - 1],
+        undosRemaining: Math.min(
+          MAX_UNDO_STEPS,
+          current.undosRemaining + 1,
+        ),
+        redoStates: current.redoStates.slice(0, -1),
+      }
+    }
+
+    case 'reset':
+      return {
+        state: createGameState(),
+        undosRemaining: MAX_UNDO_STEPS,
+        redoStates: [],
+      }
+
+    default:
+      return current
+  }
+}
+
 function App() {
-  const [{ state, undosRemaining, redoStates }, setGame] = useState(loadGame)
+  const [game, dispatch] = useReducer(gameReducer, undefined, loadGame)
+  const { state, undosRemaining, redoStates } = game
   const [confirmingReset, setConfirmingReset] = useState(false)
 
   useEffect(() => {
@@ -126,34 +181,15 @@ function App() {
   const stuck = isStuck(state)
 
   const handleCellClick = (position: Position) => {
-    setGame((current) => ({
-      state: placeNumber(current.state, position),
-      undosRemaining: current.undosRemaining,
-      redoStates: [],
-    }))
+    dispatch({ type: 'place', position })
   }
 
   const handleUndo = () => {
-    if (undosRemaining === 0 || state.nextNumber === 1) return
-
-    setGame((current) => ({
-      state: undoLastMove(current.state),
-      undosRemaining: current.undosRemaining - 1,
-      redoStates: [...current.redoStates, current.state],
-    }))
+    dispatch({ type: 'undo' })
   }
 
   const handleRedo = () => {
-    if (redoStates.length === 0) return
-
-    setGame((current) => ({
-      state: current.redoStates[current.redoStates.length - 1],
-      undosRemaining: Math.min(
-        MAX_UNDO_STEPS,
-        current.undosRemaining + 1,
-      ),
-      redoStates: current.redoStates.slice(0, -1),
-    }))
+    dispatch({ type: 'redo' })
   }
 
   const handleReset = () => {
@@ -161,11 +197,7 @@ function App() {
   }
 
   const handleConfirmReset = () => {
-    setGame({
-      state: createGameState(),
-      undosRemaining: MAX_UNDO_STEPS,
-      redoStates: [],
-    })
+    dispatch({ type: 'reset' })
     setConfirmingReset(false)
   }
 
